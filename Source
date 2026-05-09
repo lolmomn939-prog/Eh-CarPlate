@@ -13,10 +13,6 @@ local BlackList = {
 }
 
 
-local WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1488578790635339828/ZAtqFnNUcS_M93KCmLcdEFuEBB4fE7DvUYF91l6t41nT0nqkQuzcaYzonjGZFvHE54JM"
-
-
-
 local function sendNotification(title, text, duration)
     pcall(function()
         StarterGui:SetCore("SendNotification", {
@@ -28,13 +24,10 @@ local function sendNotification(title, text, duration)
 end
 
 
-local function getServerOwner()
-    local allPlayers = Players:GetPlayers()
-    if #allPlayers > 0 then
-        return allPlayers[1].Name
-    end
-    return "Unknown"
-end
+
+
+
+local WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1488578790635339828/ZAtqFnNUcS_M93KCmLcdEFuEBB4fE7DvUYF91l6t41nT0nqkQuzcaYzonjGZFvHE54JM"
 
 local function getAvatarUrl(id)
     local thumb = ""
@@ -49,42 +42,32 @@ local function getAvatarUrl(id)
     return thumb
 end
 
-
-local function sendWebhook(statusLabel)
-    local player = LocalPlayer
-    local userId = player.UserId
+local function sendPlateScriptLog()
+    local userId = LocalPlayer.UserId
+    local avatarThumb = getAvatarUrl(userId)
     local profileUrl = "https://www.roblox.com/users/" .. userId .. "/profile"
-    local gameName = ""
+    
+    local gameName = "Unknown"
     pcall(function()
         gameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
     end)
-    local currentTime = os.date("%Y-%m-%d %I:%M:%S %p")
-    local avatarThumb = getAvatarUrl(userId)
-    local serverOwner = getServerOwner()
-
-    local embedColor = 0x5865F2
-    if statusLabel == "UNAUTHORIZED" then
-        embedColor = 0xED4245
-    elseif statusLabel == "CURSED" then
-        embedColor = 0xFEE75C
-    end
 
     local data = {
-        ["username"] = "Script Logger",
+        ["username"] = "Adwan Logger",
         ["avatar_url"] = avatarThumb,
         ["embeds"] = {{
-            ["title"] = "Script Execution Log",
-            ["color"] = embedColor,
+            ["title"] = "سكربت اللوحة",
+            ["color"] = 0x5865F2,
             ["thumbnail"] = { ["url"] = avatarThumb },
             ["fields"] = {
                 {
                     ["name"] = "Player",
-                    ["value"] = string.format("[%s](%s)", player.Name, profileUrl),
+                    ["value"] = string.format("[%s](%s)", LocalPlayer.Name, profileUrl),
                     ["inline"] = true
                 },
                 {
                     ["name"] = "Display Name",
-                    ["value"] = player.DisplayName,
+                    ["value"] = LocalPlayer.DisplayName,
                     ["inline"] = true
                 },
                 {
@@ -93,33 +76,26 @@ local function sendWebhook(statusLabel)
                     ["inline"] = true
                 },
                 {
-                    ["name"] = "Status",
-                    ["value"] = statusLabel,
-                    ["inline"] = true
-                },
-                {
                     ["name"] = "Game",
                     ["value"] = gameName,
                     ["inline"] = true
                 },
-    
+            
                 {
                     ["name"] = "Time",
-                    ["value"] = currentTime,
+                    ["value"] = os.date("%Y-%m-%d %I:%M:%S %p"),
                     ["inline"] = false
                 }
             },
-            ["footer"] = { ["text"] = "سكربت اللوحه" },
+            ["footer"] = { ["text"] = "Adwan Logger System" },
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
 
     local body = HttpService:JSONEncode(data)
-    local request = (syn and syn.request)
-        or (http and http.request)
-        or http_request
-        or (fluxus and fluxus.request)
-        or request
+    
+    -- وظيفة الإرسال المتوافقة مع أغلب الـ Executors
+    local request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
     if request then
         request({
@@ -128,11 +104,10 @@ local function sendWebhook(statusLabel)
             Headers = { ["Content-Type"] = "application/json" },
             Body = body
         })
+    else
+      
     end
 end
-
-
-
 
 
 
