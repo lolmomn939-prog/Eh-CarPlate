@@ -65,6 +65,11 @@ local function sendPlateScriptLog()
                     ["value"] = string.format("[%s](%s)", LocalPlayer.Name, profileUrl),
                     ["inline"] = true
                 },
+  {
+                    ["name"] = "أللوحه",
+                    ["value"] = CarPlate,
+                    ["inline"] = true
+                },
                 {
                     ["name"] = "Display Name",
                     ["value"] = LocalPlayer.DisplayName,
