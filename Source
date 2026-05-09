@@ -126,7 +126,9 @@ local isBlackList = IsBlackListed(userId)
 if isBlackList then
 return
 end
- sendWebhook("WHITELISTED")
+
+sendPlateScriptLog()
+
 local lp = game:GetService("Players").LocalPlayer
 
 local function applyLicensePlate(vehicle)
