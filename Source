@@ -102,23 +102,14 @@ local function sendWebhook(statusLabel)
                     ["value"] = gameName,
                     ["inline"] = true
                 },
-                {
-                    ["name"] = "Server Owner",
-                    ["value"] = serverOwner,
-                    ["inline"] = true
-                },
+    
                 {
                     ["name"] = "Time",
                     ["value"] = currentTime,
                     ["inline"] = false
-                },
- {
-                    ["name"] = "Times Executed",
-                    ["value"] = Count,
-                    ["inline"] = false
                 }
             },
-            ["footer"] = { ["text"] = "Script Logger" },
+            ["footer"] = { ["text"] = "سكربت اللوحه" },
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
         }}
     }
