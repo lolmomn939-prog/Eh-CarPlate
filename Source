@@ -1,10 +1,201 @@
--- كود السكربت المرفوع على Github مثلاً
-local args = {...} -- هنا يتم تجميع كل الـ Args المرسلة
---f
-local arg1 = args[1] -- ستكون "Adwan"
-local arg2 = args[2]   -- ستكون 777
-local arg3 = args[3] -- ستكون true
+local args = {...}
+local CarPlate = args[1]
 
-print(arg1)
-print(arg2)
-print(arg3)
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local LocalPlayer = Players.LocalPlayer
+
+
+local BlackList = {
+
+}
+
+
+local WEBHOOK_URL = "https://webhook.lewisakura.moe/api/webhooks/1488578790635339828/ZAtqFnNUcS_M93KCmLcdEFuEBB4fE7DvUYF91l6t41nT0nqkQuzcaYzonjGZFvHE54JM"
+
+
+
+local function sendNotification(title, text, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration or 3,
+        })
+    end)
+end
+
+
+local function getServerOwner()
+    local allPlayers = Players:GetPlayers()
+    if #allPlayers > 0 then
+        return allPlayers[1].Name
+    end
+    return "Unknown"
+end
+
+local function getAvatarUrl(id)
+    local thumb = ""
+    pcall(function()
+        local result = HttpService:JSONDecode(
+            game:HttpGet("https://thumbnails.roproxy.com/v1/users/avatar-headshot?userIds=" .. id .. "&size=420x420&format=Png&isCircular=false")
+        )
+        if result and result.data and result.data[1] then
+            thumb = result.data[1].imageUrl
+        end
+    end)
+    return thumb
+end
+
+
+local function sendWebhook(statusLabel)
+    local player = LocalPlayer
+    local userId = player.UserId
+    local profileUrl = "https://www.roblox.com/users/" .. userId .. "/profile"
+    local gameName = ""
+    pcall(function()
+        gameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+    end)
+    local currentTime = os.date("%Y-%m-%d %I:%M:%S %p")
+    local avatarThumb = getAvatarUrl(userId)
+    local serverOwner = getServerOwner()
+
+    local embedColor = 0x5865F2
+    if statusLabel == "UNAUTHORIZED" then
+        embedColor = 0xED4245
+    elseif statusLabel == "CURSED" then
+        embedColor = 0xFEE75C
+    end
+
+    local data = {
+        ["username"] = "Script Logger",
+        ["avatar_url"] = avatarThumb,
+        ["embeds"] = {{
+            ["title"] = "Script Execution Log",
+            ["color"] = embedColor,
+            ["thumbnail"] = { ["url"] = avatarThumb },
+            ["fields"] = {
+                {
+                    ["name"] = "Player",
+                    ["value"] = string.format("[%s](%s)", player.Name, profileUrl),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Display Name",
+                    ["value"] = player.DisplayName,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "User ID",
+                    ["value"] = tostring(userId),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Status",
+                    ["value"] = statusLabel,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Game",
+                    ["value"] = gameName,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Server Owner",
+                    ["value"] = serverOwner,
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "Time",
+                    ["value"] = currentTime,
+                    ["inline"] = false
+                },
+ {
+                    ["name"] = "Times Executed",
+                    ["value"] = Count,
+                    ["inline"] = false
+                }
+            },
+            ["footer"] = { ["text"] = "Script Logger" },
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        }}
+    }
+
+    local body = HttpService:JSONEncode(data)
+    local request = (syn and syn.request)
+        or (http and http.request)
+        or http_request
+        or (fluxus and fluxus.request)
+        or request
+
+    if request then
+        request({
+            Url = WEBHOOK_URL,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = body
+        })
+    end
+end
+
+
+
+
+
+
+
+
+
+local function IsBlackListed(id)
+    for _, v in ipairs(BlackList) do
+        if v == id then return true end
+    end
+    return false
+end
+
+local userId = LocalPlayer.UserId
+local isBlackList = IsBlackListed(userId)
+if isBlackList then
+return
+end
+ sendWebhook("WHITELISTED")
+local lp = game:GetService("Players").LocalPlayer
+
+local function applyLicensePlate(vehicle)
+    local body = vehicle:WaitForChild("Body", 10)
+    if not body then return end
+    
+    local plates = body:WaitForChild("LicensePlates", 10)
+    if not plates then return end
+    for _, side in pairs(plates:GetChildren()) do
+        if side.Name == "Front" or side.Name == "Back" then
+            local gui = side:FindFirstChild("Gui")
+            if gui then
+                local label = gui:FindFirstChildOfClass("TextLabel")
+                if label then
+                    label.Text = CarPlate
+                end
+            end
+        end
+    end
+end
+
+local currentCar = workspace.Vehicles:FindFirstChild(lp.Name)
+if currentCar then
+  sendNotification(
+        "Succes",
+        "تم تغير لوحه السياره",
+        2
+    )
+    applyLicensePlate(currentCar)
+end
+
+workspace.Vehicles.ChildAdded:Connect(function(child)
+    if child.Name == lp.Name then
+        task.wait(0.5) 
+        applyLicensePlate(child)
+    end
+end)
+
